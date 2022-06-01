@@ -25,18 +25,6 @@ fn = os.getcwd() + '/args.json'
 with open(fn) as infile:
     hp = EasyDict(json.load(infile))
 
-
-# # load data
-# print('Loading data...')
-# traindata = load_data(hp.root + hp.traindata_fn)
-# valdata = load_data(hp.root + hp.valdata_fn)
-
-# # process dataset (normalize, randomize, etc)
-# print('Normalizing data...')
-# preprocess = DataPreProcess(traindata, hp.xnames, hp.ynames, t_thresh=None)
-# trainX, trainY,_,_ = preprocess.transform(traindata, randomize=True, holdback_fraction=0.1)
-# valX, valY,_,_ = preprocess.transform(valdata, randomize=True, holdback_fraction=0.0)
-
 # load data
 print('Loading data...')
 data_pca = load_data(ROOT + hp.dataset_dir + hp.data_pca_fn)
@@ -106,9 +94,10 @@ print('Making figures...')
 if hp.shape_control_mode:
     plot_response_timetraces(hp.shots2plot, net, data_pca, preprocess,hp)
 else:
-    plot_response_coeffs(data_pca, preprocess, net, hp, ncoeffs=3)
+    plot_response_coeffs(hp.shots2plot, data_pca, preprocess, net, hp, ncoeffs=3)
+    tok_data = sio.loadmat(ROOT + hp.obj_dir + 'tok_data.mat')['tok_data']
     for shot in hp.shots2plot:
-        visualize_response_prediction(data_pca, preprocess, net, loss_fcn, hp, shot, nsamples=10)
+        visualize_response_prediction(data_pca, preprocess, net, loss_fcn, hp, shot, tok_data, nsamples=10)
 
 plt.show()
 print('Done.')

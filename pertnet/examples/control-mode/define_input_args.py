@@ -23,7 +23,7 @@ jobdir = ROOT + 'pertnet/examples/control-mode'
 
 ''' HYPERPARAMETERS FOR THE NN'''  
 hp = EasyDict()
-hp.num_epochs = 3          #  num of epochs to train for
+hp.num_epochs = 300          #  num of epochs to train for
 hp.batch_size = 50           #  batch size during training
 hp.learn_rate =  3e-5        #  learning rate used during training (Adam optimizer)
 hp.p_dropout_in = 0          #  dropout rate input layer (range 0-1)

@@ -4,6 +4,9 @@ This script defines input args used by the neural net, such as which variables a
 inputs and outputs, and various hyperparameters. These parameters are then written to the
 args.json file which is used by eqnet_batch.py. 
 
+Changing the variable 'nn_mode' will change the inputs and outputs as described in the reference paper,
+to perform either equilibrium reconstruction or forward Grad-Shavranov solving. 
+
 If performing multiple batch job submission, submit_jobs.py in the net folder performs the similar task. 
 '''
 
