@@ -104,6 +104,9 @@ elif nn_mode == 'reconstruction-control':
 
 settings.pretrained_model_fn  = jobdir + '/results_cached/net.pth'
 
+
+
+
 # write to file
 args = {**hp, **settings}
 args_fn = jobdir + '/args.json'

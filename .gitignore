@@ -20,16 +20,17 @@
 **/.vscode*
 *args.json
 
+**/job*
+
 # Temporary exclusions
 **/results_cached*
 **/eval/*
-**/pertnet*
 
 
 
 # Files to specifically include
-!train_test_val_split.mat
 !data_pca_017.dat
+!data_pca_013.dat
 
 
 

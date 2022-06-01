@@ -114,7 +114,7 @@ if hp.shape_control_mode:
 else:
 
     # plot timetraces of pca coefficients
-    plot_response_coeffs(testdata, preprocess, net, hp, ncoeffs=2)
+    plot_response_coeffs(data_pca, preprocess, net, hp, ncoeffs=2)
 
     # plot predictions of flux on grid
     plot_times = [.040, .060, .100, 0.150, .200, .300, .500, 1.00]
@@ -128,7 +128,7 @@ else:
         plot_fun = plot_psizr_pla_for_shot    
 
     for shot in shotlist:
-        plot_fun(shot, plot_times, net, testdata, preprocess, tok_data_struct, hp, mpc, mpv)
+        plot_fun(shot, plot_times, net, data_pca, preprocess, tok_data_struct, hp, mpc, mpv)
 
 
 
