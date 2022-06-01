@@ -131,9 +131,8 @@ def visualize_response_prediction(data, preprocess, net, loss_fcn, hp, ishot=0, 
 # =====================================
 # Plot prediction of response pca coeff
 # =====================================
-def plot_response_coeffs(data, preprocess, net, hp, ncoeffs='all'):
+def plot_response_coeffs(shotlist, data, preprocess, net, hp, ncoeffs='all'):
 
-    shotlist = np.unique(data['shot'])
     nshots = len(shotlist)
 
     X, Y,_,_ = preprocess.transform(data)

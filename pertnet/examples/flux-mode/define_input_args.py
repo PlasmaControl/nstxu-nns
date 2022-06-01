@@ -6,8 +6,7 @@ args.json file which is used by pertnet_batch.py.
 
 If performing multiple batch job submission, submit_jobs.py in the net folder performs the similar task. 
 
-These settings configure Pertnet for "control-mode", ie directly predict the response 
-of shaping parameters to the coils. 
+These settings configure Pertnet for "flux-mode", predict the response of the flux wrt coil currents, li, betap.
 '''
 
 import os
@@ -18,7 +17,7 @@ import numpy as np
 
 # file paths
 ROOT = os.environ['NN_ROOT']
-jobdir = ROOT + 'pertnet/examples/control-mode'
+jobdir = ROOT + 'pertnet/examples/flux-mode'
 
 
 ''' HYPERPARAMETERS FOR THE NN'''  
@@ -46,7 +45,7 @@ settings.dataset_dir = '/pertnet/data/datasets/'
 settings.data_pca_fn = '/data_pca_013.dat'
 settings.load_results_dir = jobdir + '/results_cached/'
 settings.save_results_dir = jobdir + '/results/'
-
+settings.obj_dir = '/data/matlab/run_gspert/obj/'
 
 # which shots and times to plot equilibria for
 settings.shots2plot = [204655, 204963, 204944]  
@@ -57,31 +56,23 @@ settings.times2plot = [.040, .060, .100, 0.150, .200, .300, .500, 1.00]
 SELECT DATA INPUTS AND OUTPUTS
 '''
 
-# 1. shape control mode 
-settings.shape_control_mode = True
+settings.shape_control_mode = False
 
-# 2. predictor variables
+# predictor variables
 settings.xnames =  ['pprime', 'ffprim', 'pres','rmaxis','zmaxis', 'psirz', 
     'coil_currents', 'vessel_currents', 'pcurrt', 'rcur', 'zcur', 'ip', 
     'qpsi', 'psimag', 'psibry', 'rbbbs', 'zbbbs', 'shape_rx_lo_filtered', 
     'shape_zx_lo_filtered', 'shape_rx_up_filtered', 'shape_zx_up_filtered', 
     'shape_islimited', 'psizr_pla']
 
+# target variables
 
-# 3. target variables
-settings.ynames = ['gamma', 'shape_drcurdix', 'shape_dzcurdix', 
-        'shape_drxlodix', 'shape_drxupdix', 'shape_dzxlodix', 'shape_dzxupdix']
+# Choose yname from: 'dpsidbetap', 'dpsidli', 'dsidix_smooth_coil###' where ### within 1-54
+#    when ### within 1-13: these correspond to the PF coils [OH, PF1AU, PF1BU, PF1CU, PF2U, 
+#                          PF3U, PF4, PF5, PF3L, PF2L, PF1CL, PF1BL, PF1AL]
+#    when ### > 14: this corresponds to vacuum vessel elements
 
-# settings.ynames += ['drdbetap', 'drdli', 'drdip', 'dzdbetap', 'dzdli', 'dzdip', 
-#      'dpsibrydbetap', 'dpsibrydli', 'dpsibrydip', 'drxdbetap', 'drxdli', 
-#      'drxdip', 'dzxdbetap', 'dzxdli', 'dzxdip']
-
-# settings.ynames = ['drdis', 'dzdis', 'drxdis', 'dzxdis', 'dpsibrydis']
-
-#settings.ynames = ['drdis', 'drdbetap', 'drdli', 'drdip', 'dzdis', 'dzdbetap', 'dzdli', 
-#      'dzdip', 'ddrsepdis', 'ddrsepdbetap', 'ddrsepdli', 'ddrsepdip', 'dpsibrydis', 
-#      'dpsibrydbetap', 'dpsibrydli', 'dpsibrydip', 'drxdis', 'drxdbetap', 'drxdli', 
-#      'drxdip', 'dzxdis', 'dzxdbetap', 'dzxdli', 'dzxdip']
+settings.ynames = ['dpsidix_smooth_coil1']  # response to OH coil
 
 
 # write to file

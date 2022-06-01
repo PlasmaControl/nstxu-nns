@@ -12,12 +12,11 @@ import matplotlib.pyplot as plt
 import shutil
 import json
 from torch.utils.data import TensorDataset, DataLoader
-from eqnet.data.data_utils import load_data
 import scipy.io as sio
-from eqnet.net.eqnet_utils import (plot_response_coeffs, plot_loss_curve, train, 
-                                   MLP, DataPreProcess, plot_shape_timetraces, 
-                                   gen_output_preds, train_val_test_split, plot_flux_preds)
-
+from pertnet.data.data_utils import load_data
+from pertnet.net.pertnet_utils import (plot_response_coeffs, gen_output_preds, 
+                            plot_loss_curve, train, MLP, DataPreProcess, visualize_response_prediction, 
+                            plot_response_timetraces, train_val_test_split)
 
 print('Loading parameters...')
 
@@ -25,21 +24,19 @@ print('Loading parameters...')
 fn = os.getcwd() + '/args.json'
 with open(fn) as infile:
     hp = EasyDict(json.load(infile))
-hp.root = ROOT
-
 
 # load data
 print('Loading data...')
 data_pca = load_data(ROOT + hp.dataset_dir + hp.data_pca_fn)
-
 traindata, valdata, testdata = train_val_test_split(data_pca, ftrain=0.8, fval=0.1, mix=True)
 
 
-# process data
+# process data (normalize, randomize, etc)
 print('Normalizing data...')
 preprocess = DataPreProcess(traindata, hp.xnames, hp.ynames, t_thresh=None)
 trainX, trainY,_,_ = preprocess.transform(traindata, randomize=True, holdback_fraction=0, by_shot=True)
 valX, valY,_,_ = preprocess.transform(valdata, randomize=True, holdback_fraction=0)
+
 
 # dataloaders
 train_dataset = TensorDataset(trainX, trainY)
@@ -53,7 +50,6 @@ out_dim = trainY.shape[1]
 net = MLP(in_dim, out_dim, hp.hidden_dims, nonlinearity=hp.nonlinearity,
           p_dropout_in=hp.p_dropout_in, p_dropout_hidden=hp.p_dropout_hidden)
 
-# loss function and optimizer
 if hp.lossfun=='L1':
     loss_fcn = torch.nn.L1Loss()
 else: 
@@ -61,9 +57,8 @@ else:
 
 optimizer = torch.optim.Adam(net.parameters(), lr=hp.learn_rate)
 
-
 if hp.use_pretrained_model:
-    pth = './net.pth'
+    pth = hp.load_results_dir + '/net.pth'
     net.load_state_dict(torch.load(pth))
     net.eval()
 else:
@@ -76,7 +71,8 @@ else:
     net.eval()
 
     # write loss to file
-    np.savetxt(hp.save_results_dir + '/loss.txt', (training_loss, validation_loss))
+    print('Saving loss...')
+    np.savetxt(hp.save_results_dir + 'loss.txt', (training_loss, validation_loss))
 
     # save model
     if hp.savemodel:
@@ -84,34 +80,35 @@ else:
         pth = hp.save_results_dir + '/net.pth'
         torch.save(net.state_dict(), pth)
 
-    # plot loss curve
-    print('Making figures...')
     plot_loss_curve(training_loss, validation_loss, hp)
-
 
 # save predictions
 out = {}
 out['test'] = gen_output_preds(testdata, preprocess, net, hp)
 out['val']  = gen_output_preds(valdata, preprocess, net, hp)
 sio.savemat(hp.save_results_dir + '/out.mat', {'out':out})
-    
 
-# plot various predictions
+# plot & visualize results
+print('Making figures...')
 
 if hp.shape_control_mode:
-
-    # plot time traces of shape control parameters    
-    plot_shape_timetraces(hp.shots2plot, net, data_pca, preprocess,hp)
-
+    plot_response_timetraces(hp.shots2plot, net, data_pca, preprocess,hp)
 else:
-
-    # plot timetraces of pca coefficients
-    plot_response_coeffs(hp.shots2plot, data_pca, preprocess, net, hp, ncoeffs=2)    
+    plot_response_coeffs(hp.shots2plot, data_pca, preprocess, net, hp, ncoeffs=3)
     tok_data = sio.loadmat(ROOT + hp.obj_dir + 'tok_data.mat')['tok_data']
-    
     for shot in hp.shots2plot:
-        plot_flux_preds(shot, hp.times2plot, net, data_pca, preprocess, tok_data, hp)
+        visualize_response_prediction(data_pca, preprocess, net, loss_fcn, hp, shot, tok_data, nsamples=10)
 
 plt.show()
 print('Done.')
+
+
+
+
+
+
+
+
+
+
 

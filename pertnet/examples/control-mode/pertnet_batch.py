@@ -12,8 +12,9 @@ import matplotlib.pyplot as plt
 import shutil
 import json
 from torch.utils.data import TensorDataset, DataLoader
+import scipy.io as sio
 from pertnet.data.data_utils import load_data
-from pertnet.net.pertnet_utils import (plot_response_coeffs, make_shot_response_movie, 
+from pertnet.net.pertnet_utils import (plot_response_coeffs, gen_output_preds, 
                             plot_loss_curve, train, MLP, DataPreProcess, visualize_response_prediction, 
                             plot_response_timetraces, train_val_test_split)
 
@@ -93,6 +94,11 @@ else:
 
     plot_loss_curve(training_loss, validation_loss, hp)
 
+# save predictions
+out = {}
+out['test'] = gen_output_preds(testdata, preprocess, net, hp)
+out['val']  = gen_output_preds(valdata, preprocess, net, hp)
+sio.savemat(hp.save_results_dir + '/out.mat', {'out':out})
 
 # plot & visualize results
 print('Making figures...')

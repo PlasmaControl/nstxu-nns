@@ -55,7 +55,12 @@ def train_val_test_split(data_pca, ftrain=0.8, fval=0.1, ftest=0.1, mix=False):
 # =====================================
 # Visualize Response Predictions
 # =====================================
-def visualize_response_prediction(data, preprocess, net, loss_fcn, hp, shot, nsamples=10):
+def visualize_response_prediction(data, preprocess, net, loss_fcn, hp, shot, tok_data, nsamples=10):
+
+    rg = tok_data['rg'][0][0].reshape(-1)
+    zg = tok_data['zg'][0][0].reshape(-1)
+    rlim = tok_data['limdata'][0][0][1,:]
+    zlim = tok_data['limdata'][0][0][0,:]
 
     def inverse_transform(y):
         y = y.detach().numpy()
@@ -84,12 +89,17 @@ def visualize_response_prediction(data, preprocess, net, loss_fcn, hp, shot, nsa
         psi_pred = inverse_transform(ypred)
 
         ax[i] = fig.add_subplot(2, int(np.ceil(nsamples / 2)), i + 1)
+        cs1 = ax[i].contour(rg, zg, psi_true, 12, colors='r', linestyles='dashed')
+        cs2 = ax[i].contour(rg, zg, psi_pred, levels=cs1.levels, colors='b', linestyles='solid')
 
-        cs = ax[i].contour(psi_true, 20, linestyles='dashed')
-        ax[i].contour(psi_pred, levels=cs.levels, linestyles='solid')
-        ax[i].legend(('True', 'Prediction'))
+        ax[i].plot(rlim, zlim, color='gray', linewidth=3)
         ax[i].set_title('t=%.3fs, Loss=%.5f' % (times[i], loss))
 
+        if i == 0:
+            h1,_ = cs1.legend_elements()
+            h2,_ = cs2.legend_elements()
+            ax[i].legend([h1[0], h2[0]], ['GSPERT', 'PERTNET'], fontsize=13)
+     
     fig.suptitle('Shot %d' % shot)
     fig.tight_layout(rect=[0, 0.03, 1, 0.95])
 
@@ -101,9 +111,8 @@ def visualize_response_prediction(data, preprocess, net, loss_fcn, hp, shot, nsa
 # =====================================
 # Plot prediction of response pca coeff
 # =====================================
-def plot_response_coeffs(data, preprocess, net, hp, ncoeffs='all'):
+def plot_response_coeffs(shotlist, data, preprocess, net, hp, ncoeffs='all'):
 
-    shotlist = np.unique(data['shot'])
     nshots = len(shotlist)
 
     X, Y,_,_ = preprocess.transform(data)
@@ -626,3 +635,45 @@ def plot_response_timetraces(shotlist, net, valdata, preprocess,hp):
         if hp.savefigs:
             fn = hp.save_results_dir +  '/traces' + str(shot) + '.png'
             plt.savefig(fn, dpi=100)
+
+
+
+# ========================
+# Save output predictions
+# ========================
+def gen_output_preds(data, preprocess, net, hp):
+    
+
+    X, Y, shots, times = preprocess.transform(data, randomize=False, holdback_fraction=0)
+    Ypred = net(X)    
+    Ypred = Ypred.detach().numpy()
+    Y = Y.detach().numpy()
+    X = X.detach().numpy()
+
+    out = {}
+    out['X'] = X
+    out['Y'] = Y
+    out['Ypred'] = Ypred
+    out['Y_coeff'] = preprocess.Y_scaler.inverse_transform(Y)
+    out['Ypred_coeff'] = preprocess.Y_scaler.inverse_transform(Ypred)
+    out['shots'] = shots
+    out['times'] = times
+
+    for tag in hp.xnames + hp.ynames:
+
+        pca = data[tag]
+        out[tag + '_pca'] = {}
+            
+        if pca.coeff_.shape[1] <= 1:
+            out[tag] = pca.coeff_
+        else:
+            try:
+                out[tag + '_pca']['coeff_'] = pca.coeff_
+                out[tag + '_pca']['components_'] = pca.components_
+                out[tag + '_pca']['mean_'] = pca.mean_
+
+                if pca.components_.shape[1] < 100:
+                    out[tag] = pca.inverse_transform(pca.coeff_)
+            except:
+                continue
+    return out
