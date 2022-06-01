@@ -74,7 +74,7 @@ The main version of the code is located in the `eqnet/net/` directory. A working
 
 The main version of the code is located in the `pertnet/net/` directory. Some working examples are provided in the `examples/control/` and `examples/flux-mode`. To run either example:
 
-*  `cd ~/pertnet/examples/flux-mode`
+*  `cd <example_directory>`
 * Edit the file `define_input_args.py` as desired. See file comments. 
 * Run the file: `python define_input_args.py`. This creates a settings file `args.json` which Pertnet reads from. 
 * Run Pertnet: `python pertnet_batch.py`

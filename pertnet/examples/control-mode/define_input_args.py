@@ -84,6 +84,9 @@ settings.ynames = ['gamma', 'shape_drcurdix', 'shape_dzcurdix',
 #      'drxdip', 'dzxdis', 'dzxdbetap', 'dzxdli', 'dzxdip']
 
 
+if not os.path.isdir(settings.save_results_dir):
+    os.makedirs(settings.save_results_dir)
+    
 # write to file
 args = {**hp, **settings}
 args_fn = jobdir + '/args.json'

@@ -108,7 +108,8 @@ elif nn_mode == 'reconstruction-control':
 settings.pretrained_model_fn  = jobdir + '/results_cached/net.pth'
 
 
-
+if not os.path.isdir(settings.save_results_dir):
+    os.makedirs(settings.save_results_dir)
 
 # write to file
 args = {**hp, **settings}

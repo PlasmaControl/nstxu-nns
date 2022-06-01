@@ -74,6 +74,8 @@ settings.xnames =  ['pprime', 'ffprim', 'pres','rmaxis','zmaxis', 'psirz',
 
 settings.ynames = ['dpsidix_smooth_coil1']  # response to OH coil
 
+if not os.path.isdir(settings.save_results_dir):
+    os.makedirs(settings.save_results_dir)
 
 # write to file
 args = {**hp, **settings}
