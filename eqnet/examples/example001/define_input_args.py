@@ -51,7 +51,7 @@ settings.save_results_dir = jobdir + '/results/'
 
 
 # which shots and times to plot equilibria for
-# shots2plot should be selected from the testdataset:
+# the testdata shot numbers are:
 #   [204655, 204656, 204658, 204659, 204660, 204661, 204944,
 #    204960, 204961, 204962, 204963, 204964, 204965, 204966,
 #    204967, 204968, 204969, 204971, 204972, 205005, 205062]
