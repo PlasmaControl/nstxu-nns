@@ -31,6 +31,8 @@
 # Files to specifically include
 !data_pca_017.dat
 !data_pca_013.dat
+!eqs.png
+!response204069_500.png
 
 
 
