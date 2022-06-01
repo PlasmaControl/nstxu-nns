@@ -1,0 +1,23 @@
+001:
+
+Reconstruction of flux surfaces
+Reconstruction of scalars
+Compares to rtEFIT and EFIT01
+
+
+
+
+
+
+
+
+
+
+002: 
+
+
+
+
+
+
+

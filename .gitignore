@@ -16,13 +16,20 @@
 *dum.txt
 *.py#
 **.ipynb_checkpoints*
+**/results/*
+**/.vscode*
+*args.json
+
+# Temporary exclusions
+**/results_cached*
+**/eval/*
+**/pertnet*
 
 
 
 # Files to specifically include
 !train_test_val_split.mat
 !data_pca_017.dat
-!train_013.dat
 
 
 
